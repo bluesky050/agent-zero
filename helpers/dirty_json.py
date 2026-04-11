@@ -1,9 +1,48 @@
 import json
+import threading
+import os
+
+# --- Format error metrics: file-based for cross-process visibility ---
+_METRICS_FILE = os.path.join(os.getcwd(), "usr", "format_metrics.json")
+_metrics_lock = threading.Lock()
+
+def _read_metrics_from_file():
+    try:
+        if os.path.exists(_METRICS_FILE):
+            with open(_METRICS_FILE, "r") as f:
+                return json.load(f)
+    except Exception:
+        pass
+    return {"total_parses": 0, "clean_parses": 0, "dirty_json_falls": 0}
+
+def _write_metrics_to_file(data):
+    try:
+        os.makedirs(os.path.dirname(_METRICS_FILE), exist_ok=True)
+        with open(_METRICS_FILE, "w") as f:
+            json.dump(data, f)
+    except Exception:
+        pass
+
+def get_metrics():
+    return _read_metrics_from_file()
+
+def reset_metrics():
+    _write_metrics_to_file({"total_parses": 0, "clean_parses": 0, "dirty_json_falls": 0})
+
+def _increment_metric(key):
+    with _metrics_lock:
+        data = _read_metrics_from_file()
+        data[key] = data.get(key, 0) + 1
+        _write_metrics_to_file(data)
 
 def try_parse(json_string: str):
+    _increment_metric("total_parses")
     try:
-        return json.loads(json_string)
+        result = json.loads(json_string)
+        _increment_metric("clean_parses")
+        return result
     except json.JSONDecodeError:
+        _increment_metric("dirty_json_falls")
         return DirtyJson.parse_string(json_string)
 
 

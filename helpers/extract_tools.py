@@ -1,4 +1,5 @@
 
+import json as _json
 from .dirty_json import DirtyJson
 import regex, re
 from helpers.modules import load_classes_from_file, load_classes_from_folder # keep here for backwards compatibility
@@ -10,6 +11,17 @@ def json_parse_dirty(json: str) -> dict[str, Any] | None:
 
     ext_json = extract_json_object_string(json.strip())
     if ext_json:
+        # --- Metrics: track clean vs dirty parsing ---
+        from helpers.dirty_json import _increment_metric
+        _increment_metric("total_parses")
+        try:
+            data = _json.loads(ext_json)
+            _increment_metric("clean_parses")
+            if isinstance(data, dict):
+                return data
+        except _json.JSONDecodeError:
+            _increment_metric("dirty_json_falls")
+        # Fallback to DirtyJson for malformed JSON
         try:
             data = DirtyJson.parse_string(ext_json)
             if isinstance(data, dict):

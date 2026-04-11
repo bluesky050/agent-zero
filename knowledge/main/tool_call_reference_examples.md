@@ -1,79 +1,119 @@
-# Tool Call Reference Examples
+## Tool Call Reference Examples
 
-These examples are intentionally short and high signal so tool-call shape guidance
-can live in knowledge without bloating the default prompt stack.
+### Correct Examples
 
-## 1) Namespaced tool (`text_editor`) vs non-namespaced tool (`code_execution_tool`)
-
-- `text_editor` requires method in `tool_name`:
-  - `text_editor:read`
-  - `text_editor:write`
-  - `text_editor:patch`
-- `code_execution_tool` uses a plain tool name plus behavior in `tool_args.runtime`.
-
-### Example A: read file lines with namespaced tool
-
-```json
+Example 1 - Simple tool with string argument:
+~~~json
 {
-  "tool_name": "text_editor:read",
-  "tool_args": {
-    "path": "/workspace/agent-zero/README.md",
-    "line_from": 1,
-    "line_to": 60
-  }
+    "thoughts": ["I need to search for current information."],
+    "headline": "Searching the web",
+    "tool_name": "search_engine",
+    "tool_args": {
+        "query": "latest LiteLLM release notes"
+    }
 }
-```
+~~~
 
-### Example B: run shell command with `code_execution_tool`
-
-```json
+Example 2 - Tool with boolean argument (use JSON boolean, not string):
+~~~json
 {
-  "tool_name": "code_execution_tool",
-  "tool_args": {
-    "runtime": "terminal",
-    "session": 0,
-    "reset": false,
-    "code": "pwd"
-  }
+    "thoughts": ["I'll delegate this coding task to a subordinate agent."],
+    "headline": "Calling subordinate",
+    "tool_name": "call_subordinate",
+    "tool_args": {
+        "message": "Fix the bug in utils.py line 42",
+        "reset": true
+    }
 }
-```
+~~~
 
-### Example C: poll ongoing terminal output
-
-```json
+Example 3 - Namespaced tool with multiple arguments:
+~~~json
 {
-  "tool_name": "code_execution_tool",
-  "tool_args": {
-    "runtime": "output",
-    "session": 0
-  }
+    "thoughts": ["I need to read a specific file first."],
+    "headline": "Reading file",
+    "tool_name": "text_editor:read",
+    "tool_args": {
+        "path": "/project/src/main.py",
+        "line_from": 1,
+        "line_to": 60
+    }
 }
-```
+~~~
 
-## 2) Memory tools use plain names and structured args
-
-```json
+Example 4 - Tool with empty optional arguments (respond to user):
+~~~json
 {
-  "tool_name": "memory_load",
-  "tool_args": {
-    "query": "tool argument format",
-    "limit": 3,
-    "threshold": 0.7
-  }
+    "thoughts": ["I have the answer, I'll respond to the user now."],
+    "headline": "Sending response",
+    "tool_name": "response",
+    "tool_args": {
+        "message": "The search results show that version 3.2 was released yesterday."
+    }
 }
-```
+~~~
 
-## 3) Subordinate tool booleans are JSON booleans
-
-```json
+Example 5 - Code execution tool:
+~~~json
 {
-  "tool_name": "call_subordinate",
-  "tool_args": {
-    "profile": "",
-    "message": "Review this patch for edge cases.",
-    "reset": true
-  }
+    "thoughts": ["I need to run a command to check the environment."],
+    "headline": "Executing code",
+    "tool_name": "code_execution_tool",
+    "tool_args": {
+        "runtime": "terminal",
+        "session": 0,
+        "code": "pip list | grep langchain"
+    }
 }
-```
+~~~
 
-Use these examples as structure references only. Adapt arguments to the current task.
+### Common Mistakes to AVOID
+
+Mistake 1 - Boolean as string (WRONG):
+~~~json
+{
+    "tool_name": "call_subordinate",
+    "tool_args": { "message": "do something", "reset": "true" }
+}
+~~~
+Correct: use JSON boolean `true` not string `"true"`
+
+Mistake 2 - tool_args as string instead of object (WRONG):
+~~~json
+{
+    "tool_name": "response",
+    "tool_args": "Hello user"
+}
+~~~
+Correct: tool_args must always be a JSON object `{}`, never a string
+
+Mistake 3 - Extra text outside the JSON object (WRONG):
+```
+I will search for that now.
+~~~json
+{
+    "tool_name": "search_engine",
+    "tool_args": { "query": "test" }
+}
+~~~
+```
+Correct: output ONLY the JSON object wrapped in ~~~json fences, no prose before or after
+
+Mistake 4 - Invented tool name not in available tools list (WRONG):
+~~~json
+{
+    "tool_name": "web_search",
+    "tool_args": { "query": "test" }
+}
+~~~
+Correct: use only tool names from the available tools list (e.g., `search_engine` not `web_search`)
+
+Mistake 5 - Missing required field tool_args (WRONG):
+~~~json
+{
+    "thoughts": ["I want to respond"],
+    "headline": "Responding",
+    "tool_name": "response"
+}
+~~~
+Correct: always include `"tool_args": {}` even if empty

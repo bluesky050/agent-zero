@@ -1,4 +1,5 @@
-import asyncio, random, string, threading
+import asyncio, random, string, threading, os
+import json as _json
 
 from collections import OrderedDict
 from dataclasses import dataclass, field
@@ -28,6 +29,44 @@ from langchain_core.messages import SystemMessage, BaseMessage
 import helpers.log as Log
 from helpers.dirty_json import DirtyJson
 from helpers.defer import DeferredTask
+
+# --- Tool call format error metrics (file-based for cross-process visibility) ---
+_TOOL_METRICS_FILE = os.path.join(os.getcwd(), "usr", "tool_metrics.json")
+_tool_metrics_lock = threading.Lock()
+
+def _read_tool_metrics_from_file():
+    try:
+        if os.path.exists(_TOOL_METRICS_FILE):
+            with open(_TOOL_METRICS_FILE, "r", encoding="utf-8") as f:
+                return _json.load(f)
+    except Exception:
+        pass
+    return {"total_tool_calls": 0, "misformat_count": 0, "tool_not_found_count": 0, "repairable_error_count": 0, "repeat_count": 0}
+
+def _write_tool_metrics_to_file(data):
+    try:
+        os.makedirs(os.path.dirname(_TOOL_METRICS_FILE), exist_ok=True)
+        with open(_TOOL_METRICS_FILE, "w", encoding="utf-8") as f:
+            _json.dump(data, f)
+    except Exception:
+        pass
+
+def _increment_tool_metric(key):
+    with _tool_metrics_lock:
+        data = _read_tool_metrics_from_file()
+        data[key] = data.get(key, 0) + 1
+        _write_tool_metrics_to_file(data)
+
+def get_tool_metrics():
+    m = _read_tool_metrics_from_file()
+    from helpers.dirty_json import get_metrics as _get_dj_metrics
+    m.update(_get_dj_metrics())
+    return m
+
+def reset_tool_metrics():
+    _write_tool_metrics_to_file({"total_tool_calls": 0, "misformat_count": 0, "tool_not_found_count": 0, "repairable_error_count": 0, "repeat_count": 0})
+    from helpers.dirty_json import reset_metrics as _reset_dj_metrics
+    _reset_dj_metrics()
 from typing import Callable
 from helpers.localization import Localization
 from helpers import extension
@@ -871,6 +910,7 @@ class Agent:
     async def process_tools(self, msg: str):
         # search for tool usage requests in agent message
         tool_request = extract_tools.json_parse_dirty(msg)
+        _increment_tool_metric("total_tool_calls")
 
         # Only validate when extraction produced an object; None means no JSON tool
         # block was found — the misformat warning path below handles that.
@@ -957,6 +997,8 @@ class Agent:
                 error_detail = (
                     f"Tool '{raw_tool_name}' not found or could not be initialized."
                 )
+                with _tool_metrics_lock:
+                    _increment_tool_metric("tool_not_found_count")
                 wmsg = self.hist_add_warning(error_detail)
                 PrintStyle(font_color="red", padding=True).print(error_detail)
                 self.context.log.log(
@@ -964,6 +1006,7 @@ class Agent:
                 )
         else:
             warning_msg_misformat = self.read_prompt("fw.msg_misformat.md")
+            _increment_tool_metric("misformat_count")
             wmsg = self.hist_add_warning(warning_msg_misformat)
             PrintStyle(font_color="red", padding=True).print(warning_msg_misformat)
             self.context.log.log(
