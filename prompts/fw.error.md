@@ -1,5 +1,5 @@
-~~~json
-{
-    "system_error": "{{error}}"
-}
-~~~
+## {{heading}}
+
+{{error_message}}
+
+Try to fix the error and try again.

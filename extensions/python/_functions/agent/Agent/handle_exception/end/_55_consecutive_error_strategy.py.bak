@@ -1,0 +1,75 @@
+import difflib
+from helpers.extension import Extension
+from helpers.print_style import PrintStyle
+
+
+class ConsecutiveErrorStrategy(Extension):
+    MAX_CONSECUTIVE = 3
+    SIMILARITY_THRESHOLD = 0.6
+
+    async def execute(self, data: dict = {}, **kwargs):
+        if not self.agent:
+            return
+
+        exception = data.get("exception")
+        if not exception:
+            # Exception was cleared by earlier extension — reset count
+            self.agent.set_data("consecutive_error_count", 0)
+            self.agent.set_data("last_error_message", "")
+            return
+
+        from helpers.errors import InterventionException
+        if isinstance(exception, InterventionException):
+            return
+
+        from helpers import errors
+        current_error = errors.format_error(exception)
+        last_error = self.agent.get_data("last_error_message") or ""
+
+        similarity = difflib.SequenceMatcher(
+            None, current_error.lower(), last_error.lower()
+        ).ratio() if last_error else 0.0
+
+        count = self.agent.get_data("consecutive_error_count") or 0
+
+        if similarity > self.SIMILARITY_THRESHOLD:
+            count += 1
+        else:
+            count = 1
+
+        self.agent.set_data("consecutive_error_count", count)
+        self.agent.set_data("last_error_message", current_error)
+
+        # Write metrics
+        import json
+        metrics_path = "/a0/usr/tool_metrics.json"
+        try:
+            with open(metrics_path, "r") as f:
+                metrics = json.load(f)
+        except Exception:
+            metrics = {}
+        metrics["consecutive_error_count"] = metrics.get("consecutive_error_count", 0) + 1
+        if count >= self.MAX_CONSECUTIVE:
+            metrics["strategy_change_triggered"] = metrics.get("strategy_change_triggered", 0) + 1
+        try:
+            import os
+            os.makedirs(os.path.dirname(metrics_path), exist_ok=True)
+            with open(metrics_path, "w") as f:
+                json.dump(metrics, f)
+        except Exception:
+            pass
+
+        if count >= self.MAX_CONSECUTIVE:
+            strategy_msg = (
+                "You have encountered the same type of error " + str(count) + " times in a row. "
+                "The current approach is NOT working. You MUST change your strategy:\n"
+                "1. Stop and reconsider — why does this keep failing?\n"
+                "2. Try a completely different tool or method.\n"
+                "3. Break the task into simpler sub-steps.\n"
+                "4. If you cannot solve this, use the `response` tool to inform the user."
+            )
+            self.agent.hist_add_warning(strategy_msg)
+            PrintStyle(font_color="orange", padding=True).print(
+                "Consecutive error #" + str(count) + ", forcing strategy change"
+            )
+            self.agent.set_data("consecutive_error_count", 0)
