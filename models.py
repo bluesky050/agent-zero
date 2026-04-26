@@ -55,9 +55,42 @@ def turn_off_logging():
             logging.getLogger(name).setLevel(logging.ERROR)
 
 
+def _init_langsmith_callback():
+    """
+    Configure LiteLLM to log LLM calls to LangSmith if LANGSMITH_API_KEY is set.
+
+    When enabled, all litellm.acompletion() / litellm.completion() calls
+    (including browser-agent calls) will be traced in LangSmith automatically.
+
+    Zero-impact when disabled: if LANGSMITH_API_KEY is absent, no logger is
+    instantiated, no periodic flush task is created, and no network calls occur.
+
+    Environment variables consumed:
+        LANGSMITH_API_KEY   - Required. LangSmith API key.
+        LANGSMITH_PROJECT   - Optional. Project name (default: "agent-zero").
+        LANGSMITH_BASE_URL  - Optional. Custom API base URL for self-hosted.
+    """
+    langsmith_api_key = os.environ.get("LANGSMITH_API_KEY")
+    if not langsmith_api_key:
+        return  # LangSmith not configured — zero overhead
+
+    # Default project name, more informative than litellm's "litellm-completion"
+    if not os.environ.get("LANGSMITH_PROJECT"):
+        os.environ["LANGSMITH_PROJECT"] = "agent-zero"
+
+    # Register "langsmith" string callback with LiteLLM.
+    # On first LLM call, LiteLLM will lazily instantiate LangsmithLogger
+    # which reads LANGSMITH_API_KEY / LANGSMITH_PROJECT from env.
+    if "langsmith" not in litellm.success_callback:
+        litellm.success_callback.append("langsmith")
+    if "langsmith" not in litellm.failure_callback:
+        litellm.failure_callback.append("langsmith")
+
+
 # init
 load_dotenv()
 turn_off_logging()
+_init_langsmith_callback()
 
 class ModelType(Enum):
     CHAT = "Chat"

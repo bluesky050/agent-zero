@@ -529,6 +529,7 @@ class Agent:
                         if (
                             self.loop_data.last_response == agent_response
                         ):  # if assistant_response is the same as last message in history, let him know
+                            _increment_tool_metric("repeat_count")
                             # Append the assistant's response to the history
                             log_item = self.loop_data.params_temporary.get("log_item_generating")
                             self.hist_add_ai_response(agent_response, id=log_item.id if log_item else "")
