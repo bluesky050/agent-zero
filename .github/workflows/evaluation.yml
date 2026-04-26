@@ -1,0 +1,87 @@
+name: Agent Evaluation
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 2 * * *'  # 每天凌晨 2 点运行
+  workflow_dispatch:  # 支持手动触发
+
+jobs:
+  evaluation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml click litellm
+
+      - name: Run code evaluation
+        env:
+          OPENAI_API_KEY: ${{ secrets.EVAL_API_KEY }}
+          OPENAI_API_BASE: ${{ secrets.EVAL_API_BASE }}
+        run: |
+          python -m evaluation.cli run \
+            --categories code \
+            --results usr/evaluation/results \
+            --json-output > evaluation_result.json
+
+      - name: Check threshold
+        run: |
+          python -m evaluation.cli check-threshold \
+            --results usr/evaluation/results/latest/summary.json \
+            --min-pass-rate 0.7 \
+            --min-intention-accuracy 0.7 \
+            --max-hallucination-rate 0.3
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: evaluation-results
+          path: |
+            usr/evaluation/results/
+            evaluation_result.json
+          retention-days: 30
+
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            try {
+              const result = JSON.parse(fs.readFileSync('evaluation_result.json', 'utf8'));
+              const body = `## 📊 Agent 评测报告
+
+| 指标 | 值 |
+|------|-----|
+| 通过率 | ${result.pass_rate} |
+| 通过/总数 | ${result.passed}/${result.total_cases} |
+| 意图识别准确率 | ${result.intention_accuracy} |
+| 幻觉率 | ${result.hallucination_rate} |
+| 平均循环次数 | ${result.avg_iterations} |
+
+${result.badcases.length > 0 ? '### ❌ 失败用例\n' + result.badcases.map(bc => `- **${bc.test_case_id}**: ${bc.reason}`).join('\n') : '### ✅ 所有用例通过'}
+`;
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: body
+              });
+            } catch (e) {
+              console.log('Failed to read results:', e);
+            }

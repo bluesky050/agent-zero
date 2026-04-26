@@ -1,10 +1,20 @@
 from typing import Callable, TypedDict
-from langchain.prompts import (
-    ChatPromptTemplate,
-    FewShotChatMessagePromptTemplate,
-)
+try:
+    from langchain.prompts import (
+        ChatPromptTemplate,
+        FewShotChatMessagePromptTemplate,
+    )
+except ImportError:
+    from langchain_core.prompts import (
+        ChatPromptTemplate,
+        FewShotChatMessagePromptTemplate,
+    )
 
-from langchain.schema import AIMessage
+try:
+    from langchain.schema import AIMessage
+except ImportError:
+    from langchain_core.messages import AIMessage
+
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from langchain_core.language_models.chat_models import BaseChatModel

@@ -44,7 +44,7 @@ _META_TARGET_RE = re.compile(
 )
 
 
-type ToggleState = Literal["enabled", "disabled", "advanced"]
+ToggleState = Literal["enabled", "disabled", "advanced"]
 
 
 class PluginAssetFile(TypedDict):
