@@ -1,0 +1,36 @@
+id: tc_code_008_regex_parsing
+name: 正则表达式解析
+category: code
+difficulty: medium
+tags:
+  - python
+  - regex
+  - parsing
+
+user_message: |
+  请使用正则表达式从以下文本中提取所有电子邮件地址和电话号码：
+
+  ```
+  联系我们：
+  客服邮箱：support@example.com
+  销售热线：400-123-4567
+  技术支持：tech@example.org
+  总部电话：(010) 8888-9999
+  传真：010-12345678
+  ```
+
+success_criteria: 正确提取出 2 个邮箱和 3 个电话号码
+
+expected_tools:
+  - code_execution
+
+expected_keywords:
+  - "re"
+  - "findall"
+  - "@"
+
+eval_intention: true
+eval_hallucination: true
+eval_completion: true
+max_iterations: 8
+timeout_seconds: 120

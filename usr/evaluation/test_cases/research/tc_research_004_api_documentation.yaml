@@ -1,0 +1,29 @@
+id: tc_research_004_api_documentation
+name: 查阅 API 文档
+category: research
+difficulty: medium
+tags:
+  - api
+  - documentation
+
+user_message: |
+  请查找 Anthropic Claude API 的官方文档，
+  说明如何使用 Python SDK 发送一条简单的消息，
+  包含必要的代码示例。
+
+success_criteria: 提供准确的 API 使用说明和可运行的代码
+
+expected_tools:
+  - search_engine
+  - code_execution
+
+expected_keywords:
+  - "anthropic"
+  - "messages.create"
+  - "api_key"
+
+eval_intention: true
+eval_hallucination: true
+eval_completion: true
+max_iterations: 12
+timeout_seconds: 300

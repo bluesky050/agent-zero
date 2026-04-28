@@ -76,8 +76,8 @@ class JudgeEvaluator(ABC):
     """
 
     DEFAULT_MODEL_CONFIG = {
-        "provider": "anthropic",
-        "name": "claude-sonnet-4-20250514",
+        "provider": "openai",
+        "name": "gpt-4o",
         "api_key": "",
         "api_base": "",
         "ctx_length": 32000,
@@ -94,7 +94,18 @@ class JudgeEvaluator(ABC):
             if file_config:
                 self.model_config = file_config
             else:
-                self.model_config = self.DEFAULT_MODEL_CONFIG.copy()
+                # 尝试从环境变量读取 Judge 模型配置
+                import os
+                env_config = {
+                    "provider": os.environ.get("JUDGE_MODEL_PROVIDER", "openai"),
+                    "name": os.environ.get("JUDGE_MODEL_NAME", "gpt-4o"),
+                    "api_key": os.environ.get("JUDGE_MODEL_API_KEY", ""),
+                    "api_base": os.environ.get("JUDGE_MODEL_API_BASE", ""),
+                }
+                if env_config["api_key"]:
+                    self.model_config = env_config
+                else:
+                    self.model_config = self.DEFAULT_MODEL_CONFIG.copy()
         self._model = None
 
     @property
@@ -361,7 +372,10 @@ class TaskCompletionJudge(JudgeEvaluator):
 
 
 class CompositeJudge(JudgeEvaluator):
-    """组合评估器 - 整合意图、幻觉、任务完成三维度评估"""
+    """组合评估器 - 整合意图、幻觉、任务完成三维度评估
+
+    同时从执行结果中计算客观指标（工具调用成功率、循环效率）。
+    """
 
     def __init__(self, model_config: dict = None):
         super().__init__(model_config)
@@ -376,6 +390,11 @@ class CompositeJudge(JudgeEvaluator):
             self.hallucination_judge.evaluate(context),
             self.completion_judge.evaluate(context),
         )
+
+        # 从执行结果中计算客观指标
+        agent_result = context.get("agent_result", {})
+        tool_call_metrics = self._calculate_tool_call_metrics(agent_result)
+        loop_metrics = self._calculate_loop_efficiency(agent_result)
 
         passed = (
             intention_result.intention_correct
@@ -396,12 +415,82 @@ class CompositeJudge(JudgeEvaluator):
             reasoning=self._build_reasoning(intention_result, hallucination_result, completion_result),
             intention_correct=intention_result.intention_correct,
             intention_confidence=intention_result.intention_confidence,
-            tool_call_success=True,
+            tool_call_success=tool_call_metrics["success"],
+            tool_call_confidence=tool_call_metrics["confidence"],
             has_hallucination=hallucination_result.has_hallucination,
             hallucination_confidence=hallucination_result.hallucination_confidence,
-            loop_efficiency_score=completion_result.loop_efficiency_score,
-            total_iterations=completion_result.total_iterations,
+            loop_efficiency_score=loop_metrics["efficiency_score"],
+            total_iterations=loop_metrics["total_iterations"],
         )
+
+    def _calculate_tool_call_metrics(self, agent_result: dict) -> dict:
+        """从执行结果中计算工具调用成功率
+
+        检查每个工具调用的返回结果，判断是否成功。
+        成功条件：结果中不包含 error/exception/failed 等错误关键词。
+        """
+        tool_calls = agent_result.get("tool_calls", [])
+
+        if not tool_calls:
+            return {"success": False, "confidence": 0.0, "success_rate": 0.0, "total": 0, "success_count": 0}
+
+        success_count = 0
+        error_keywords = ["error", "exception", "failed", "traceback", "错误", "失败"]
+
+        for call in tool_calls:
+            result = str(call.get("tool_result", "")).lower()
+            # 检查是否有错误关键词
+            has_error = any(kw in result for kw in error_keywords)
+            if not has_error and result.strip():  # 有内容且无错误
+                success_count += 1
+
+        total = len(tool_calls)
+        success_rate = success_count / total if total > 0 else 0.0
+
+        return {
+            "success": success_rate >= 0.8,  # 80% 以上成功率视为成功
+            "confidence": success_rate if total > 0 else 0.0,
+            "success_rate": success_rate,
+            "total": total,
+            "success_count": success_count,
+        }
+
+    def _calculate_loop_efficiency(self, agent_result: dict) -> dict:
+        """从执行结果中计算循环效率
+
+        效率指标：
+        - 循环次数：越少越好（相对于任务复杂度）
+        - 效率得分：基准循环次数 / 实际循环次数
+        """
+        total_iterations = agent_result.get("total_iterations", 0)
+        tool_calls = agent_result.get("tool_calls", [])
+
+        # 计算唯一工具数
+        unique_tools = set()
+        for call in tool_calls:
+            tool_name = call.get("tool_name", "")
+            if tool_name:
+                unique_tools.add(tool_name)
+
+        # 基准循环次数（根据任务类型假设）
+        # 简单任务预期 3-5 次循环
+        baseline_iterations = 5
+
+        # 效率得分 = min(1.0, 基准次数 / 实际次数)
+        # 循环次数越少得分越高，超过基准次数得分降低
+        if total_iterations <= 0:
+            efficiency_score = 0.0
+        elif total_iterations <= baseline_iterations:
+            efficiency_score = 1.0
+        else:
+            efficiency_score = baseline_iterations / total_iterations
+
+        return {
+            "total_iterations": total_iterations,
+            "unique_tools_count": len(unique_tools),
+            "unique_tools": list(unique_tools),
+            "efficiency_score": efficiency_score,
+        }
 
     def build_prompt(self, context: dict) -> str:
         return ""

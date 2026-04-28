@@ -1,7 +1,36 @@
 from datetime import datetime
 from typing import Any, List, Sequence
-from langchain.storage import InMemoryByteStore, LocalFileStore
-from langchain.embeddings import CacheBackedEmbeddings
+from langchain_core.stores import InMemoryByteStore
+from langchain_classic.embeddings import CacheBackedEmbeddings
+
+
+# LocalFileStore replacement for langchain 1.x compatibility
+class LocalFileStore:
+    """Simple file-based byte store for caching embeddings."""
+    def __init__(self, root_path: str):
+        self.root_path = root_path
+        import os
+        os.makedirs(root_path, exist_ok=True)
+
+    def mget(self, keys):
+        import os
+        result = []
+        for key in keys:
+            path = os.path.join(self.root_path, key)
+            if os.path.exists(path):
+                with open(path, 'rb') as f:
+                    result.append(f.read())
+            else:
+                result.append(None)
+        return result
+
+    def mset(self, key_value_pairs):
+        import os
+        for key, value in key_value_pairs:
+            path = os.path.join(self.root_path, key)
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            with open(path, 'wb') as f:
+                f.write(value)
 from helpers import guids
 
 # from langchain_chroma import Chroma

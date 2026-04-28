@@ -1,0 +1,34 @@
+id: tc_code_002_add_function
+name: 添加新函数
+category: code
+difficulty: easy
+tags:
+  - python
+  - function
+
+user_message: |
+  请在以下代码中添加一个计算平均值的函数 `calculate_average(numbers)`：
+
+  ```python
+  def calculate_sum(a, b):
+      return a + b
+
+  def calculate_difference(a, b):
+      return a - b
+  ```
+
+success_criteria: 添加的函数能正确计算列表平均值
+
+expected_tools:
+  - code_execution
+
+expected_keywords:
+  - "average"
+  - "sum"
+  - "len"
+
+eval_intention: true
+eval_hallucination: true
+eval_completion: true
+max_iterations: 5
+timeout_seconds: 60

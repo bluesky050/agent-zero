@@ -1,0 +1,37 @@
+id: tc_research_006_troubleshoot_error
+name: 排查错误信息
+category: research
+difficulty: medium
+tags:
+  - troubleshooting
+  - error
+
+user_message: |
+  我在运行 Python 代码时遇到以下错误：
+
+  ```
+  Traceback (most recent call last):
+    File "test.py", line 5, in <module>
+      result = my_dict['nonexistent_key']
+  KeyError: 'nonexistent_key'
+  ```
+
+  请解释这个错误的原因，并提供至少两种解决方案。
+
+success_criteria: 准确解释错误原因，提供可行解决方案
+
+expected_tools:
+  - search_engine
+  - code_execution
+
+expected_keywords:
+  - "KeyError"
+  - "get"
+  - "defaultdict"
+  - "in"
+
+eval_intention: true
+eval_hallucination: true
+eval_completion: true
+max_iterations: 10
+timeout_seconds: 180

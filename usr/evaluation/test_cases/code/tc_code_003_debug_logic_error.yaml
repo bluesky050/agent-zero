@@ -1,0 +1,40 @@
+id: tc_code_003_debug_logic_error
+name: 调试逻辑错误
+category: code
+difficulty: medium
+tags:
+  - python
+  - debug
+  - logic
+
+user_message: |
+  以下代码应该找出列表中的最大值，但有逻辑错误，请找出并修复：
+
+  ```python
+  def find_max(numbers):
+      max_value = 0
+      for num in numbers:
+          if num < max_value:
+              max_value = num
+      return max_value
+
+  # 测试
+  print(find_max([3, 7, 2, 9, 1]))  # 应该输出 9
+  print(find_max([-5, -2, -8]))     # 应该输出 -2
+  ```
+
+success_criteria: 修复后两个测试用例都能正确输出
+
+expected_tools:
+  - code_execution
+
+expected_keywords:
+  - "逻辑错误"
+  - "初始化"
+  - "比较"
+
+eval_intention: true
+eval_hallucination: true
+eval_completion: true
+max_iterations: 8
+timeout_seconds: 120

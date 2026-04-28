@@ -1,0 +1,34 @@
+id: tc_code_005_write_tests
+name: 编写单元测试
+category: code
+difficulty: medium
+tags:
+  - python
+  - testing
+  - unittest
+
+user_message: |
+  请为以下函数编写单元测试：
+
+  ```python
+  def is_palindrome(s: str) -> bool:
+      """检查字符串是否为回文"""
+      s = s.lower().replace(" ", "")
+      return s == s[::-1]
+  ```
+
+success_criteria: 测试覆盖正常情况、边界情况和异常情况
+
+expected_tools:
+  - code_execution
+
+expected_keywords:
+  - "test"
+  - "assert"
+  - "unittest"
+
+eval_intention: true
+eval_hallucination: true
+eval_completion: true
+max_iterations: 8
+timeout_seconds: 120

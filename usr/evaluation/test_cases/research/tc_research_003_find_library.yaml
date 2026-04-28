@@ -1,0 +1,27 @@
+id: tc_research_003_find_library
+name: 查找合适的第三方库
+category: research
+difficulty: easy
+tags:
+  - library
+  - python
+
+user_message: |
+  我需要在 Python 中解析 HTML 页面，请推荐一个流行的库，
+  说明如何安装和基本使用方法。
+
+success_criteria: 推荐合适的库，提供安装命令和示例
+
+expected_tools:
+  - search_engine
+
+expected_keywords:
+  - "BeautifulSoup"
+  - "lxml"
+  - "pip install"
+
+eval_intention: true
+eval_hallucination: true
+eval_completion: true
+max_iterations: 8
+timeout_seconds: 120

@@ -1,0 +1,30 @@
+id: tc_tool_006_list_operations
+name: 列表操作
+category: tool_use
+difficulty: easy
+tags:
+  - list
+  - data_structure
+
+user_message: |
+  给定列表 `[3, 1, 4, 1, 5, 9, 2, 6, 5, 3]`，请：
+  1. 去重并保持顺序
+  2. 排序
+  3. 找出中位数
+  4. 计算平均值
+
+success_criteria: 所有计算正确
+
+expected_tools:
+  - code_execution
+
+expected_keywords:
+  - "set"
+  - "sort"
+  - "median"
+
+eval_intention: true
+eval_hallucination: true
+eval_completion: true
+max_iterations: 5
+timeout_seconds: 60

@@ -1,0 +1,30 @@
+id: tc_tool_002_directory_operations
+name: 目录操作
+category: tool_use
+difficulty: easy
+tags:
+  - directory
+  - filesystem
+
+user_message: |
+  请执行以下操作：
+  1. 创建目录 `/tmp/test_dir/subdir`
+  2. 在其中创建一个文件 `test.txt`
+  3. 列出目录内容
+  4. 删除创建的文件和目录
+
+success_criteria: 所有操作成功执行
+
+expected_tools:
+  - code_execution
+
+expected_keywords:
+  - "mkdir"
+  - "listdir"
+  - "remove"
+
+eval_intention: true
+eval_hallucination: true
+eval_completion: true
+max_iterations: 8
+timeout_seconds: 120

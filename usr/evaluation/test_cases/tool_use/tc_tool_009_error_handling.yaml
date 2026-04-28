@@ -1,0 +1,32 @@
+id: tc_tool_009_error_handling
+name: 错误处理
+category: tool_use
+difficulty: medium
+tags:
+  - error
+  - exception
+
+user_message: |
+  请编写代码处理以下可能出错的场景：
+  1. 打开可能不存在的文件
+  2. 解析可能无效的 JSON
+  3. 访问可能不存在的字典键
+
+  每种情况都要有适当的错误处理，不要让程序崩溃。
+
+success_criteria: 所有错误情况都被正确处理
+
+expected_tools:
+  - code_execution
+
+expected_keywords:
+  - "try"
+  - "except"
+  - "FileNotFoundError"
+  - "KeyError"
+
+eval_intention: true
+eval_hallucination: true
+eval_completion: true
+max_iterations: 10
+timeout_seconds: 120

@@ -1,0 +1,28 @@
+id: tc_research_005_explain_concept
+name: 解释技术概念
+category: research
+difficulty: easy
+tags:
+  - concept
+  - explanation
+
+user_message: |
+  请解释 Python 中的"生成器"和"迭代器"的区别，
+  并给出各自的使用场景和代码示例。
+
+success_criteria: 解释清晰，示例准确
+
+expected_tools:
+  - code_execution
+
+expected_keywords:
+  - "yield"
+  - "__iter__"
+  - "__next__"
+  - "懒加载"
+
+eval_intention: true
+eval_hallucination: true
+eval_completion: true
+max_iterations: 8
+timeout_seconds: 120

@@ -1,0 +1,29 @@
+id: tc_code_009_api_request
+name: API 请求处理
+category: code
+difficulty: medium
+tags:
+  - python
+  - api
+  - http
+
+user_message: |
+  请编写代码向 JSONPlaceholder API (https://jsonplaceholder.typicode.com/posts) 发送 GET 请求，
+  获取前 5 篇文章的标题，并计算标题的平均长度。
+
+success_criteria: 正确获取数据并计算平均长度
+
+expected_tools:
+  - code_execution
+
+expected_keywords:
+  - "requests"
+  - "get"
+  - "json"
+  - "len"
+
+eval_intention: true
+eval_hallucination: true
+eval_completion: true
+max_iterations: 10
+timeout_seconds: 120
