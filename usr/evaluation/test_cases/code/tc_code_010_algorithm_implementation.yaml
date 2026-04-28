@@ -1,0 +1,33 @@
+id: tc_code_010_algorithm_implementation
+name: 算法实现
+category: code
+difficulty: hard
+tags:
+  - python
+  - algorithm
+  - sorting
+
+user_message: |
+  请实现一个快速排序算法，并添加以下功能：
+  1. 支持自定义比较函数
+  2. 支持按对象属性排序
+  3. 添加性能统计（比较次数、交换次数）
+
+  用示例验证：对以下数据按年龄排序
+  [{"name": "Alice", "age": 30}, {"name": "Bob", "age": 25}, {"name": "Charlie", "age": 35}]
+
+success_criteria: 排序正确，性能统计准确
+
+expected_tools:
+  - code_execution
+
+expected_keywords:
+  - "quicksort"
+  - "partition"
+  - "compare"
+
+eval_intention: true
+eval_hallucination: true
+eval_completion: true
+max_iterations: 15
+timeout_seconds: 180

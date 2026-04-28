@@ -1,0 +1,27 @@
+id: tc_tool_001_file_read_write
+name: 文件读写操作
+category: tool_use
+difficulty: easy
+tags:
+  - file
+  - io
+
+user_message: |
+  请创建一个文本文件 `/tmp/test_file.txt`，
+  写入 "Hello, Agent-Zero!"，
+  然后读取并打印内容。
+
+success_criteria: 文件创建成功，内容正确读取
+
+expected_tools:
+  - code_execution
+
+expected_keywords:
+  - "Hello"
+  - "Agent-Zero"
+
+eval_intention: true
+eval_hallucination: true
+eval_completion: true
+max_iterations: 5
+timeout_seconds: 60

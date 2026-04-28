@@ -1,0 +1,30 @@
+id: tc_tool_004_system_info
+name: 获取系统信息
+category: tool_use
+difficulty: easy
+tags:
+  - system
+  - os
+
+user_message: |
+  请获取并显示以下系统信息：
+  - 当前工作目录
+  - 操作系统名称
+  - Python 版本
+  - 环境变量数量
+
+success_criteria: 正确获取所有系统信息
+
+expected_tools:
+  - code_execution
+
+expected_keywords:
+  - "os.getcwd"
+  - "os.name"
+  - "sys.version"
+
+eval_intention: true
+eval_hallucination: true
+eval_completion: true
+max_iterations: 5
+timeout_seconds: 60

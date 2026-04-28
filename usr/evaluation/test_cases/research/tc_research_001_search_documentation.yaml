@@ -1,0 +1,27 @@
+id: tc_research_001_search_documentation
+name: 搜索官方文档
+category: research
+difficulty: easy
+tags:
+  - search
+  - documentation
+
+user_message: |
+  请搜索 Python 官方文档，了解 `collections.defaultdict` 的用法，并给出一个使用示例。
+
+success_criteria: 提供准确的用法说明和可运行的示例代码
+
+expected_tools:
+  - search_engine
+  - code_execution
+
+expected_keywords:
+  - "defaultdict"
+  - "default_factory"
+  - "示例"
+
+eval_intention: true
+eval_hallucination: true
+eval_completion: true
+max_iterations: 10
+timeout_seconds: 180

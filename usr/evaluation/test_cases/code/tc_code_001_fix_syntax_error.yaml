@@ -1,0 +1,35 @@
+id: tc_code_001_fix_syntax_error
+name: 修复 Python 语法错误
+category: code
+difficulty: easy
+tags:
+  - python
+  - syntax
+  - bug_fix
+
+user_message: |
+  请修复以下 Python 代码中的语法错误：
+
+  ```python
+  def calculate_sum(a, b)
+      return a + b
+
+  result = calculate_sum(1, 2
+  print(result)
+  ```
+
+success_criteria: 代码能够正确执行并输出结果 3
+
+expected_tools:
+  - code_execution
+
+expected_keywords:
+  - "语法错误"
+  - "冒号"
+  - "括号"
+
+eval_intention: true
+eval_hallucination: true
+eval_completion: true
+max_iterations: 5
+timeout_seconds: 60

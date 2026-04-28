@@ -1,0 +1,29 @@
+id: tc_research_007_best_practices
+name: 查找最佳实践
+category: research
+difficulty: medium
+tags:
+  - best_practices
+  - python
+
+user_message: |
+  请研究 Python 项目的目录结构最佳实践，
+  说明一个标准的 Python 项目应该包含哪些目录和文件，
+  并解释每个部分的作用。
+
+success_criteria: 提供合理的目录结构建议，解释清晰
+
+expected_tools:
+  - search_engine
+
+expected_keywords:
+  - "src"
+  - "tests"
+  - "setup.py"
+  - "requirements.txt"
+
+eval_intention: true
+eval_hallucination: true
+eval_completion: true
+max_iterations: 10
+timeout_seconds: 180

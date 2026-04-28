@@ -1,0 +1,36 @@
+id: tc_tool_008_dictionary_operations
+name: 字典操作
+category: tool_use
+difficulty: medium
+tags:
+  - dict
+  - data_structure
+
+user_message: |
+  有两个字典：
+  ```python
+  dict1 = {"a": 1, "b": 2, "c": 3}
+  dict2 = {"b": 20, "d": 4}
+  ```
+
+  请：
+  1. 合并两个字典（dict2 的值覆盖 dict1）
+  2. 找出所有键
+  3. 找出值大于 5 的键值对
+  4. 按值排序
+
+success_criteria: 所有操作正确
+
+expected_tools:
+  - code_execution
+
+expected_keywords:
+  - "update"
+  - "keys"
+  - "sorted"
+
+eval_intention: true
+eval_hallucination: true
+eval_completion: true
+max_iterations: 8
+timeout_seconds: 120

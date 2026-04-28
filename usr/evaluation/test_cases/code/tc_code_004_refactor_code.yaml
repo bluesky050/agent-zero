@@ -1,0 +1,40 @@
+id: tc_code_004_refactor_code
+name: 重构代码结构
+category: code
+difficulty: medium
+tags:
+  - python
+  - refactor
+  - clean_code
+
+user_message: |
+  请重构以下代码，使其更清晰、更符合 Python 风格：
+
+  ```python
+  def calc(x,y,z):
+      a=x+y
+      b=a*z
+      c=b/2
+      if c>100:
+          return "big"
+      elif c>50:
+          return "medium"
+      else:
+          return "small"
+  ```
+
+success_criteria: 重构后的代码功能相同，但更易读
+
+expected_tools:
+  - code_execution
+
+expected_keywords:
+  - "变量名"
+  - "类型提示"
+  - "常量"
+
+eval_intention: true
+eval_hallucination: true
+eval_completion: true
+max_iterations: 8
+timeout_seconds: 120

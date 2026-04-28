@@ -1,0 +1,28 @@
+id: tc_research_008_version_comparison
+name: 版本特性对比
+category: research
+difficulty: hard
+tags:
+  - comparison
+  - python
+
+user_message: |
+  请对比 Python 3.10 和 3.11 的主要新特性，
+  并说明升级到 3.11 的主要优势。
+
+success_criteria: 准确列举新特性，对比分析合理
+
+expected_tools:
+  - search_engine
+
+expected_keywords:
+  - "match"
+  - "case"
+  - "性能"
+  - "Faster CPython"
+
+eval_intention: true
+eval_hallucination: true
+eval_completion: true
+max_iterations: 12
+timeout_seconds: 300

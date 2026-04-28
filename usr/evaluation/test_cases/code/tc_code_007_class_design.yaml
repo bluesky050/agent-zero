@@ -1,0 +1,35 @@
+id: tc_code_007_class_design
+name: 设计类结构
+category: code
+difficulty: hard
+tags:
+  - python
+  - oop
+  - class
+
+user_message: |
+  请设计一个银行账户类 `BankAccount`，需要包含：
+  - 账户余额
+  - 存款方法
+  - 取款方法（余额不足时抛出异常）
+  - 查询余额方法
+  - 交易历史记录
+
+  并创建一个子类 `SavingsAccount`，添加利息计算功能。
+
+success_criteria: 类功能完整，能正确处理存取款和利息计算
+
+expected_tools:
+  - code_execution
+
+expected_keywords:
+  - "class"
+  - "def"
+  - "balance"
+  - "interest"
+
+eval_intention: true
+eval_hallucination: true
+eval_completion: true
+max_iterations: 15
+timeout_seconds: 180

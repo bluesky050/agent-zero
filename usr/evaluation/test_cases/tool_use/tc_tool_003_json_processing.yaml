@@ -1,0 +1,31 @@
+id: tc_tool_003_json_processing
+name: JSON 数据处理
+category: tool_use
+difficulty: easy
+tags:
+  - json
+  - data
+
+user_message: |
+  请处理以下 JSON 数据：
+  1. 解析 JSON 字符串
+  2. 添加一个新字段 "processed": true
+  3. 格式化输出
+
+  JSON 数据: `{"name": "test", "value": 123}`
+
+success_criteria: 正确解析和修改 JSON
+
+expected_tools:
+  - code_execution
+
+expected_keywords:
+  - "json.loads"
+  - "processed"
+  - "true"
+
+eval_intention: true
+eval_hallucination: true
+eval_completion: true
+max_iterations: 5
+timeout_seconds: 60

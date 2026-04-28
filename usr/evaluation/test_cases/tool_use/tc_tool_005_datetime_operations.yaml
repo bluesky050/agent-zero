@@ -1,0 +1,30 @@
+id: tc_tool_005_datetime_operations
+name: 日期时间操作
+category: tool_use
+difficulty: easy
+tags:
+  - datetime
+  - time
+
+user_message: |
+  请执行以下日期时间操作：
+  1. 获取当前日期时间
+  2. 计算 7 天后的日期
+  3. 格式化输出为 "YYYY-MM-DD HH:MM:SS"
+  4. 计算今年已过天数
+
+success_criteria: 所有日期计算正确
+
+expected_tools:
+  - code_execution
+
+expected_keywords:
+  - "datetime"
+  - "timedelta"
+  - "strftime"
+
+eval_intention: true
+eval_hallucination: true
+eval_completion: true
+max_iterations: 5
+timeout_seconds: 60

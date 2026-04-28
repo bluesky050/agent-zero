@@ -1,0 +1,32 @@
+id: tc_code_006_file_operations
+name: 文件读写操作
+category: code
+difficulty: easy
+tags:
+  - python
+  - file
+  - io
+
+user_message: |
+  请编写代码完成以下操作：
+  1. 创建一个临时文本文件，写入 10 行随机数字（每行一个 1-100 的随机数）
+  2. 读取文件内容
+  3. 计算这些数字的总和和平均值
+  4. 将结果追加写入文件末尾
+
+success_criteria: 文件包含原始数据和计算结果
+
+expected_tools:
+  - code_execution
+
+expected_keywords:
+  - "open"
+  - "write"
+  - "read"
+  - "sum"
+
+eval_intention: true
+eval_hallucination: true
+eval_completion: true
+max_iterations: 8
+timeout_seconds: 120

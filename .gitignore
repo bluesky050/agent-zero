@@ -41,6 +41,9 @@ usr/**/*
 # But allow .gitkeep files
 !usr/**/.gitkeep
 
+# Allow evaluation test cases
+!usr/evaluation/test_cases/**
+
 
 # Global rule to include .gitkeep files anywhere
 !**/.gitkeep

@@ -1,0 +1,29 @@
+id: tc_research_009_security_research
+name: 安全最佳实践研究
+category: research
+difficulty: hard
+tags:
+  - security
+  - best_practices
+
+user_message: |
+  请研究 Python Web 应用中防止 SQL 注入的安全最佳实践，
+  提供具体的代码示例说明如何正确使用参数化查询。
+
+success_criteria: 提供准确的安全建议和示例代码
+
+expected_tools:
+  - search_engine
+  - code_execution
+
+expected_keywords:
+  - "SQL注入"
+  - "参数化"
+  - "prepared statement"
+  - "cursor.execute"
+
+eval_intention: true
+eval_hallucination: true
+eval_completion: true
+max_iterations: 12
+timeout_seconds: 300

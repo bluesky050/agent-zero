@@ -1,0 +1,32 @@
+id: tc_tool_010_multi_step_task
+name: 多步骤任务
+category: tool_use
+difficulty: hard
+tags:
+  - complex
+  - multi_step
+
+user_message: |
+  请完成以下多步骤任务：
+  1. 生成 100 个 1-1000 的随机整数
+  2. 找出其中的质数
+  3. 将质数写入文件
+  4. 从文件读取并计算统计信息（平均、最大、最小）
+  5. 打印结果报告
+
+success_criteria: 完成所有步骤，结果正确
+
+expected_tools:
+  - code_execution
+
+expected_keywords:
+  - "random"
+  - "质数"
+  - "write"
+  - "read"
+
+eval_intention: true
+eval_hallucination: true
+eval_completion: true
+max_iterations: 15
+timeout_seconds: 180

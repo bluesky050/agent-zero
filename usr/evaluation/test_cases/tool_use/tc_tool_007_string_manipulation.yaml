@@ -1,0 +1,36 @@
+id: tc_tool_007_string_manipulation
+name: 字符串处理
+category: tool_use
+difficulty: medium
+tags:
+  - string
+  - text
+
+user_message: |
+  处理以下文本：
+  ```
+  "  Hello,  World!  This is a TEST.  "
+  ```
+
+  请：
+  1. 去除首尾空白
+  2. 替换多个空格为单个空格
+  3. 转换为小写
+  4. 按空格分割为列表
+  5. 统计每个单词出现次数
+
+success_criteria: 所有处理步骤正确
+
+expected_tools:
+  - code_execution
+
+expected_keywords:
+  - "strip"
+  - "split"
+  - "lower"
+
+eval_intention: true
+eval_hallucination: true
+eval_completion: true
+max_iterations: 8
+timeout_seconds: 120

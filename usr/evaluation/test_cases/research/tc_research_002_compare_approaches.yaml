@@ -1,0 +1,32 @@
+id: tc_research_002_compare_approaches
+name: 比较不同实现方案
+category: research
+difficulty: medium
+tags:
+  - comparison
+  - analysis
+
+user_message: |
+  请研究 Python 中处理 CSV 文件的三种主要方法：
+  1. 使用内置 csv 模块
+  2. 使用 pandas
+  3. 使用 csvkit
+
+  比较它们的优缺点，并给出每种方法的适用场景。
+
+success_criteria: 提供客观的对比分析，包含具体特点说明
+
+expected_tools:
+  - search_engine
+
+expected_keywords:
+  - "csv"
+  - "pandas"
+  - "性能"
+  - "内存"
+
+eval_intention: true
+eval_hallucination: true
+eval_completion: true
+max_iterations: 12
+timeout_seconds: 300
