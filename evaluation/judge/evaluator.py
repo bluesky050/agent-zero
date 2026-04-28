@@ -76,8 +76,8 @@ class JudgeEvaluator(ABC):
     """
 
     DEFAULT_MODEL_CONFIG = {
-        "provider": "anthropic",
-        "name": "claude-sonnet-4-20250514",
+        "provider": "openai",
+        "name": "gpt-4o",
         "api_key": "",
         "api_base": "",
         "ctx_length": 32000,
@@ -94,7 +94,18 @@ class JudgeEvaluator(ABC):
             if file_config:
                 self.model_config = file_config
             else:
-                self.model_config = self.DEFAULT_MODEL_CONFIG.copy()
+                # 尝试从环境变量读取 Judge 模型配置
+                import os
+                env_config = {
+                    "provider": os.environ.get("JUDGE_MODEL_PROVIDER", "openai"),
+                    "name": os.environ.get("JUDGE_MODEL_NAME", "gpt-4o"),
+                    "api_key": os.environ.get("JUDGE_MODEL_API_KEY", ""),
+                    "api_base": os.environ.get("JUDGE_MODEL_API_BASE", ""),
+                }
+                if env_config["api_key"]:
+                    self.model_config = env_config
+                else:
+                    self.model_config = self.DEFAULT_MODEL_CONFIG.copy()
         self._model = None
 
     @property

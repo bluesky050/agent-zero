@@ -42,6 +42,11 @@ jobs:
           A0_SET___model_config__utility_model__name: Pro/zai-org/GLM-4.7
           A0_SET___model_config__utility_model__api_key: ${{ secrets.EVAL_API_KEY }}
           A0_SET___model_config__utility_model__api_base: ${{ secrets.EVAL_API_BASE }}
+          # Judge 模型配置（使用 openai provider）
+          JUDGE_MODEL_PROVIDER: openai
+          JUDGE_MODEL_NAME: Pro/zai-org/GLM-4.7
+          JUDGE_MODEL_API_KEY: ${{ secrets.EVAL_API_KEY }}
+          JUDGE_MODEL_API_BASE: ${{ secrets.EVAL_API_BASE }}
         run: |
           python -m evaluation.cli run \
             --categories code \
