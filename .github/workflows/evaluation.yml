@@ -32,6 +32,15 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.EVAL_API_KEY }}
           OPENAI_API_BASE: ${{ secrets.EVAL_API_BASE }}
+          # Agent 模型配置（与 Judge 使用相同模型）
+          A0_SET___model_config__chat_model__provider: openai
+          A0_SET___model_config__chat_model__name: Pro/zai-org/GLM-4.7
+          A0_SET___model_config__chat_model__api_key: ${{ secrets.EVAL_API_KEY }}
+          A0_SET___model_config__chat_model__api_base: ${{ secrets.EVAL_API_BASE }}
+          A0_SET___model_config__utility_model__provider: openai
+          A0_SET___model_config__utility_model__name: Pro/zai-org/GLM-4.7
+          A0_SET___model_config__utility_model__api_key: ${{ secrets.EVAL_API_KEY }}
+          A0_SET___model_config__utility_model__api_base: ${{ secrets.EVAL_API_BASE }}
         run: |
           python -m evaluation.cli run \
             --categories code \

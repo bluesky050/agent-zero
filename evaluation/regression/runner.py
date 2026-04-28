@@ -4,15 +4,56 @@
 运行回归测试，收集指标，执行评估。
 """
 
+import os
+import sys
+from pathlib import Path
+
+# 设置 HuggingFace 镜像（解决中国大陆网络问题）
+# 必须在导入其他模块之前设置
+if "HF_ENDPOINT" not in os.environ:
+    os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
+
+# 手动加载 .env 文件中的关键环境变量
+def _load_env_file():
+    """手动加载 .env 文件中的关键环境变量"""
+    env_path = Path(__file__).parent.parent.parent / "usr" / ".env"
+    if env_path.exists():
+        with open(env_path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#") and "=" in line:
+                    key, value = line.split("=", 1)
+                    key = key.strip()
+                    value = value.strip()
+                    if key and key not in os.environ:
+                        os.environ[key] = value
+
+_load_env_file()
+
+# 保存原始 sys.argv
+_original_argv = sys.argv.copy()
+
+# 设置 dockerized 模式参数（必须在 runtime.initialize 之前）
+# 在 dockerized 模式下，函数会直接调用而不是通过 HTTP RFC
+sys.argv = [sys.argv[0]] + [arg for arg in sys.argv[1:] if not arg.startswith("--dockerized")]
+sys.argv.append("--dockerized=true")
+
 import asyncio
 import json
-import os
 import subprocess
 import tempfile
 import time
 from datetime import datetime
-from pathlib import Path
 from typing import Optional, Any
+
+# 初始化 runtime 并强制设置 dockerized 模式
+from helpers import runtime as _runtime
+_runtime.initialize()
+# 强制设置 dockerized 模式（覆盖参数解析结果）
+_runtime.args["dockerized"] = True
+
+# 恢复原始 sys.argv（让 Click 正常解析）
+sys.argv = _original_argv
 
 from .test_case import RegressionTestCase, TestCaseLoader
 from evaluation.metrics.models import EvaluationResult, EvaluationReport
@@ -216,21 +257,29 @@ class RegressionRunner:
             # 提取执行历史
             agent = context.get_agent()
             if agent:
-                # 获取工具调用历史
+                # 获取循环数据
                 loop_data = getattr(agent, "loop_data", None)
                 if loop_data:
-                    agent_result["tool_calls"] = list(getattr(loop_data, "tool_calls", []))
                     agent_result["total_iterations"] = loop_data.iteration
 
-                # 获取历史消息
+                # 从历史记录中提取工具调用信息
                 history = getattr(agent, "history", None)
                 if history:
+                    tool_calls = []
                     messages = []
                     for msg in history.output():
+                        content = msg.get("content", "")
+                        # 检查是否是工具结果消息
+                        if isinstance(content, dict) and "tool_name" in content:
+                            tool_calls.append({
+                                "tool_name": content.get("tool_name", ""),
+                                "tool_result": str(content.get("tool_result", ""))[:500],
+                            })
                         messages.append({
                             "ai": msg.get("ai", False),
-                            "content": str(msg.get("content", ""))[:500]
+                            "content": str(content)[:500]
                         })
+                    agent_result["tool_calls"] = tool_calls
                     agent_result["messages"] = messages
 
             # 清理测试上下文
@@ -323,11 +372,18 @@ class RegressionRunner:
         if intention_results:
             report.intention_accuracy = sum(1 for r in intention_results if r.intention_correct) / len(intention_results)
 
+        # 计算工具调用成功率
+        # tool_call_confidence 存储的是实际成功率 (0.0-1.0)
+        if results:
+            report.tool_call_success_rate = sum(r.tool_call_confidence for r in results) / len(results)
+
         hallucination_results = [r for r in results if r.has_hallucination is not None or r.hallucination_confidence > 0]
         if hallucination_results:
             report.hallucination_rate = sum(1 for r in hallucination_results if r.has_hallucination) / len(hallucination_results)
 
+        # 计算平均循环次数和效率得分
         report.avg_iterations = sum(r.total_iterations for r in results) / len(results) if results else 0
+        report.avg_efficiency_score = sum(r.loop_efficiency_score for r in results) / len(results) if results else 0
 
         # 详细结果
         report.case_results = [r.to_dict() for r in results]

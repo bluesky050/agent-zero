@@ -1,8 +1,13 @@
 import asyncio
+import os
 from helpers import runtime, whisper, settings
 from helpers.print_style import PrintStyle
 from helpers import kokoro_tts
 import models
+
+# 设置 HuggingFace 镜像（解决中国大陆网络问题）
+if "HF_ENDPOINT" not in os.environ:
+    os.environ["HF_ENDPOINT"] = "https://hf-mirror.com"
 
 
 async def preload():
