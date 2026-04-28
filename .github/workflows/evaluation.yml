@@ -26,7 +26,8 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pyyaml click litellm langchain langchain-community langchain-core faiss-cpu sentence-transformers
+          pip install -r requirements.txt
+          pip install pyyaml click litellm
 
       - name: Run code evaluation
         env:
